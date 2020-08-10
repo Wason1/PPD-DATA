@@ -8,6 +8,8 @@ import re
 import glob
 import csv
 import shutil
+import datetime
+from datetime import datetime
 print('Libs Imported')
 #endregion
 
@@ -35,8 +37,7 @@ df_file = df_file.fillna(value=values)
 print('deleted')
 #endregion
 
-#%%
-# LOOP THROUGH
+#Loop though and make each ppd a row
 #region
 row_number = 0
 df_out = pd.DataFrame(columns= df_file.columns)
@@ -53,9 +54,57 @@ for item in df_file['Teachers']:
         df_out = df_out.append(new_row)
     row_number += 1
 df_out.reset_index(inplace = True, drop = True)
-print('ALL DONE')
-        
+print('ALL DONE')      
+#endregion
+
+# Calculate difference in time
+#region
+#%%
+periodto = pd.to_datetime(df_out['Period to'])
+periodfrom = pd.to_datetime(df_out['Period from'])
+difference_time = periodto - periodfrom
+
+currentrow = 0
+for item in difference_time:
+    difference_time.iloc[currentrow] = difference_time.iloc[currentrow].total_seconds()/3600
+    currentrow +=1
+
+df_out['TIME'] = difference_time
+df_out['TIME'].values[df_out['TIME'].values > 7.6] = 7.6
+
+# %%
 #endregion
 
 
+# Make each teacher a row
+#region
+lst_uniq_teachers = df_out['Teachers'].unique()
+
+
+
+#%%
+lst_of_lsts = []
+for teacher_name in lst_uniq_teachers:
+    bools_temp = df_out['Teachers'] == teacher_name
+    df_temp_teacher = df_out[bools_temp]
+    df_temp_teacher.reset_index(inplace = True, drop = True)
+    df_temp_teacher.fillna(value = ' ', inplace = True)
+
+    lst_row = [teacher_name]
+    for index, row in df_temp_teacher.iterrows():
+        datecorr = row['Date from']
+        datecorr = str (datecorr)
+        timecorr = row['TIME']
+        timecorr = str(timecorr)
+        timecorr = timecorr[ 0 : 4 ]
+        duration_date = timecorr + ' | (' + datecorr + ')'
+        lst_row.append(duration_date)
+    lst_of_lsts.append(lst_row)
+
+    df=pd.DataFrame(lst_of_lsts)
+         
+    
+    
+
+column_names = ['NAME', 'PPD1', 'PPD2', 'PPD3', 'PPD4', 'PPD5', 'PPD6']
 # %%
