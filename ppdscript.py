@@ -28,27 +28,34 @@ search_term ="PPD"
 # boolean series returned 
 Bool_Ser_Filter = df_file["Event name"].str.startswith(search_term)
 df_file = df_file[Bool_Ser_Filter]
-df_file.reset_index(inplace = True)
+df_file.reset_index(inplace = True, drop = True)
 #replace blank teachers with 'Unkown, Teacher'
 values = {'Teachers': 'Unkown, Teacher'}
-df_file.fillna(value=values)
+df_file = df_file.fillna(value=values)
 print('deleted')
 #endregion
 
 #%%
 # LOOP THROUGH
 #region
+row_number = 0
+df_out = pd.DataFrame(columns= df_file.columns)
 for item in df_file['Teachers']:
     str_teacher = str(item)
     str_teacher = str_teacher.replace(', ', ',')
     lst_teacher = str_teacher.split(',')
     lst_f_names = lst_teacher[0::2]
     lst_l_names = lst_teacher[1::2]
-    lst_teacher2 = [i+j for i,j in zip(lst_l_names, lst_teacher[::2])]
-    print(lst_teacher2)
+    lst_teacher2 = [i+', '+j for i,j in zip(lst_f_names, lst_l_names)]
+    for ateacher in lst_teacher2:
+        new_row = df_file.iloc[row_number]
+        new_row.iloc[7] = ateacher
+        df_out = df_out.append(new_row)
+    row_number += 1
+df_out.reset_index(inplace = True, drop = True)
+print('ALL DONE')
+        
 #endregion
-'''
-column_names = df_file.columns
-df2 = pd.DataFrame(columns = column_names)
-'''
+
+
 # %%
