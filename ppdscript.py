@@ -102,9 +102,13 @@ for teacher_name in lst_uniq_teachers:
     lst_of_lsts.append(lst_row)
 
     df=pd.DataFrame(lst_of_lsts)
-         
+    col_mapper = { 0: 'Name', 1: 'PPD1', 2: 'PPD2', 3: 'PPD3', 4: 'PPD4'}
+    df.rename( columns = col_mapper, inplace=True)
+    output_filenamepath = 'C:/PPD-Data.xlsx'
+    df.to_excel(output_)
+
     
     
 
-column_names = ['NAME', 'PPD1', 'PPD2', 'PPD3', 'PPD4', 'PPD5', 'PPD6']
+
 # %%
